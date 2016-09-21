@@ -1,0 +1,52 @@
+
+sqlite3 openflights
+
+
+CREATE TABLE Airports(
+   Airport_ID varchar(255) primary key,
+   Name varchar(255),
+   City varchar(255),
+   Country varchar(255),
+   IATA/FAA varchar(3),
+   ICAO varchar(4),
+   Latitude FLOAT,
+   Altitude FLOAT,
+   Timezone FLOAT,
+   DST CHARACTER(1),
+   Tz_database_time_zone VARCHAR(255)
+);
+
+
+CREATE TABLE Airline(
+   Airline_ID VARCHAR(255) PRIMARY KEY,
+   Name VARCHAR(255),
+   Alias VARCHAR(255),
+   IATA VARCHAR(2),
+   ICAO VARCHAR(3),
+   Callsign VARCHAR(255),
+   Country VARCHAR(255),
+   Active VARCHAR(1)
+);
+
+
+CREATE TABLE Route (
+   Airline VARCHAR(3),
+   Airline_ID VARCHAR(255) PRIMARY KEY,
+   Source_airport VARCHAR(255),
+   Source_airport_ID VARCHAR(255),
+   Destination_airport VARCHAR(255),
+   Destination_airport_ID VARCHAR(255),
+   Codeshare VARCHAR(1),
+   Stops INT,
+   Equipment VARCHAR(255)
+);
+
+.mode csv airports.dats
+.import openflights airports.dats
+
+.mode csv airline.dats
+.import openflights airline.dats
+
+.mode csv routes.dats
+.import openflights routes.dats
+
