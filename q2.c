@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h> 
+database_name="openflights.db"
 
 static int callback(void *data, int argc, char **argv, char **azColName){
    int i;
@@ -21,7 +22,7 @@ int main(int argc, char* argv[])
    const char* data = "Callback function called";
 
    /* Open database */
-   rc = sqlite3_open("test.db", &db);
+   rc = sqlite3_open(database_name, &db);
    if( rc ){
       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
       return(0);
