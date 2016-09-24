@@ -19,21 +19,19 @@ for YEG->LHR would be LHR->YEG by the same airline).
 */
 
 SELECT al.Airline_ID
-FROM Airport ap, airline al, routes r
-WHERE r.Airline_ID = al.Airline_ID AND r.source_airport_ID = ap.Airport_ID 
-      AND r.Destination_airport_ID = ap.Airport_ID AND al.active = 'Y' AND 
-      al.ICAO IS NOT NULL AND al.IATA IS NOT NULL AND al.callsign IS NOT NULL AND
-      al.country IS NOT NULL
-
+FROM airports ap, airlines al, routes r, airlines al2, routes r2
+WHERE r.Airline_ID = al.Airline_ID AND r2.Airline_ID = al2.Airline_ID
+      AND al.Airline_ID = al2.Airline_ID AND al.active = 'Y' 
+      AND al.ICAO IS NOT NULL AND al.IATA IS NOT NULL AND al.callsign 
+      IS NOT NULL AND al.country IS NOT NULL
 EXCEPT
-
 SELECT al.Airline_ID
-FROM Airport ap, airline al, routes r
-WHERE r.Airline_ID = al.Airline_ID AND r.source_airport_ID = ap.Airport_ID 
-      AND r.Destination_airport_ID = ap.Airport_ID AND al.active = 'Y' AND 
-
-
-
+FROM Airports ap, Airports ap2 airlines al, routes r, airlines al2, routes r2
+WHERE r.Airline_ID = al.Airline_ID AND r2.Airline_ID = al2.Airline_ID
+      AND al.Airline_ID = al2.Airline_ID AND r.Source_airport_ID = 
+      r2.Destination_airport_ID AND r.Destination_airport_ID = r2.Source_airport_ID
+      AND al.active = 'Y' AND al.ICAO IS NOT NULL AND al.IATA 
+      IS NOT NULL AND al.callsign IS NOT NULL AND al.country IS NOT NULL
 
 
 /*
@@ -43,13 +41,22 @@ Write a C program, in a file called q3.c that prints the list of
 top-10 countries with the most airlines flying to/from Canada.
 */
 
+
 SELECT ap.country, COUNT(*)
-FROM Airport ap, airline al, routes r
-WHERE r.Airline_ID = al.Airline_ID AND r.source_airport_ID = ap.Airport_ID 
-      AND r.Destination_airport_ID = ap.Airport_ID AND ap.Airport_ID = 'Canada'
+FROM
+   (
+      (SELECT ap.country
+      FROM Airport ap, airline al, routes r
+      WHERE r.Airline_ID = al.Airline_ID AND r.source_airport_ID = ap.Airport_ID 
+            AND 
+            AND ap.Airport_ID = 'Canada')
+      UNION ALL
+      (SELECT ap.country
+      FROM Airport ap, airline al, routes r
+      WHERE r.Airline_ID = al.Airline_ID AND r.Destination_airport_ID = ap.Airport_ID
+            AND ap.Airport_ID = 'Canada')
+   )
 GROUP BY ap.country;
-
-
 
 
 /*
@@ -138,3 +145,12 @@ WHERE
 
 
 
+
+
+SELECT al.Airline_ID
+FROM Airport ap, airline al, routes r, airline al2, routes r2
+WHERE r.Airline_ID = al.Airline_ID AND r2.Airline_ID = al2.Airline_ID
+      AND al.Airline_ID = al2.Airline_ID AND r.Source_airport_ID != 
+      r2.Destination_airport_ID AND r.Destination_airport_ID != r2.Source_airport_ID
+      AND al.AND al.active = 'Y' AND al.ICAO IS NOT NULL AND al.IATA IS 
+      NOT NULL AND al.callsign IS NOT NULL AND al.country IS NOT NULL
