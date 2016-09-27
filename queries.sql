@@ -18,20 +18,20 @@ airlines that do not have a reciprocal return. (A reciprocal return flight
 for YEG->LHR would be LHR->YEG by the same airline).
 */
 
-SELECT al.Airline_ID
+SELECT al.Airline_ID, al.country, al.Alias
 FROM airports ap, airlines al, routes r, airlines al2, routes r2
 WHERE r.Airline_ID = al.Airline_ID AND r2.Airline_ID = al2.Airline_ID
       AND al.Airline_ID = al2.Airline_ID AND al.active = 'Y' 
       AND al.ICAO IS NOT NULL AND al.IATA IS NOT NULL AND al.callsign 
       IS NOT NULL AND al.country IS NOT NULL
 EXCEPT
-SELECT al.Airline_ID
-FROM Airports ap, Airports ap2, airlines al, routes r, airlines al2, routes r2
-WHERE r.Airline_ID = al.Airline_ID AND r2.Airline_ID = al2.Airline_ID
-      AND al.Airline_ID = al2.Airline_ID AND r.Source_airport_ID = 
-      r2.Destination_airport_ID AND r.Destination_airport_ID = r2.Source_airport_ID
-      AND al.active = 'Y' AND al.ICAO IS NOT NULL AND al.IATA 
-      IS NOT NULL AND al.callsign IS NOT NULL AND al.country IS NOT NULL;
+SELECT al8.Airline_ID, al8.country, al8.alias
+FROM Airports ap8, Airports ap9, airlines al8, routes r8, airlines al9, routes r9
+WHERE r8.Airline_ID = al9.Airline_ID AND r9.Airline_ID = al9.Airline_ID
+      AND al8.Airline_ID = al9.Airline_ID AND r8.Source_airport_ID = 
+      r9.Destination_airport_ID AND r8.Destination_airport_ID = r9.Source_airport_ID
+      AND al8.active = 'Y' AND al8.ICAO IS NOT NULL AND al8.IATA 
+      IS NOT NULL AND al8.callsign IS NOT NULL AND al8.country IS NOT NULL;
 
 
 /*
@@ -69,7 +69,7 @@ See https://en.wikipedia.org/wiki/Geographical_distance.
 */
 
 SELECT 
-FROM
+FROMcsyfw
 WHERE
 
 
