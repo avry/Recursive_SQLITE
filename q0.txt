@@ -32,7 +32,7 @@ CREATE TABLE airlines(
 CREATE TABLE routes (
    Airline VARCHAR(3),
    Airline_ID VARCHAR(255),
-   Source_airport VARCHAR(255),sel
+   Source_airport VARCHAR(255),
    Source_airport_ID VARCHAR(255),
    Destination_airport VARCHAR(255),
    Destination_airport_ID VARCHAR(255),

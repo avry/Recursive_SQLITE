@@ -87,8 +87,9 @@ distance between the respective airports).
 See https://en.wikipedia.org/wiki/Geographical_distance.
 */
 
-SELECT * 
-FROM routes
+SELECT r1.* , ap1.latitude, ap1.longitude, ap2.latitude, ap2.longitude
+FROM routes r1, airports ap1, airports ap2
+WHERE r1.source_airport_ID = ap1.airport_id and r1.destination_airport_ID = ap2.airport_id
 
 
 
