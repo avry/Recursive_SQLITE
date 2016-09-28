@@ -36,7 +36,7 @@ int main(int argc, char **argv){
     	return(1);
   	}*/
 
-  	rc = sqlite3_open(argv[1], &db);
+  	rc = sqlite3_open(database_name, &db);
   	if( rc ){
     	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
     	sqlite3_close(db);
