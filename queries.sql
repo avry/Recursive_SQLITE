@@ -33,7 +33,13 @@ SELECT r8.airline, r8.Airline_ID, r8.source_airport, r8.source_airport_ID,
 r8.Destination_airport, r8.Destination_airport_ID, r8.codeshare,r8.stops, r8.equipment
 FROM  routes r8, routes r9
 WHERE r8.Airline_ID = r9.Airline_ID AND r8.source_airport_ID=r9.Destination_airport_ID
-      and r8.Destination_airport_ID = r9.source_airport_ID)
+      and r8.Destination_airport_ID = r9.source_airport_ID
+EXCEPT
+SELECT r6.*
+FROM  airports ap6, airports ap7, routes r6
+WHERE r6.destination_airport_id = ap6.airport_id and r6.source_airport_ID = ap7.airport_id 
+      and ap7.country = ap6.country
+      )
 
 
 /* result is 1862 records*/
