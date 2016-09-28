@@ -18,6 +18,29 @@ airlines that do not have a reciprocal return. (A reciprocal return flight
 for YEG->LHR would be LHR->YEG by the same airline).
 */
 
+
+
+SELECT r.airline, r.Airline_ID, r.source_airport, r.source_airport_ID,
+r.Destination_airport, r.Destination_airport_ID, r.codeshare,r.stops, r.equipment
+FROM airlines al, routes r
+WHERE r.Airline_ID = al.Airline_ID 
+      AND al.active = 'Y' 
+      AND al.ICAO IS NOT NULL AND al.IATA IS NOT NULL AND al.callsign 
+      IS NOT NULL AND al.country IS NOT NULL
+EXCEPT
+SELECT r8.airline, r8.Airline_ID, r8.source_airport, r8.source_airport_ID,
+r8.Destination_airport, r8.Destination_airport_ID, r8.codeshare,r8.stops, r8.equipment
+FROM  routes r8, routes r9
+WHERE r8.Airline_ID = r9.Airline_ID AND 
+      r8.Destination_airport_ID <> r9.Destination_airport_ID AND
+      r8.Source_airport_ID <> r8.Source_airport_ID
+      AND r8.source_airport_ID = r9.Destination_airport_ID
+      and r8.Destination_airport_ID = r9.source_airport_ID
+
+
+
+
+
 SELECT al.Airline_ID, al.country, al.Alias
 FROM airports ap, airlines al, routes r, airlines al2, routes r2
 WHERE r.Airline_ID = al.Airline_ID AND r2.Airline_ID = al2.Airline_ID
@@ -25,6 +48,7 @@ WHERE r.Airline_ID = al.Airline_ID AND r2.Airline_ID = al2.Airline_ID
       AND al.ICAO IS NOT NULL AND al.IATA IS NOT NULL AND al.callsign 
       IS NOT NULL AND al.country IS NOT NULL
 EXCEPT
+
 SELECT al8.Airline_ID, al8.country, al8.alias
 FROM Airports ap8, Airports ap9, airlines al8, routes r8, airlines al9, routes r9
 WHERE r8.Airline_ID = al9.Airline_ID AND r9.Airline_ID = al9.Airline_ID
@@ -40,25 +64,18 @@ Q3 (5 pts)
 Write a C program, in a file called q3.c that prints the list of 
 top-10 countries with the most airlines flying to/from Canada.
 */
-
-
-SELECT ap.country, COUNT(*)
-FROM
-   (
-      (SELECT ap.country
-      FROM Airport ap, airline al, routes r
-      WHERE r.Airline_ID = al.Airline_ID AND r.source_airport_ID = ap.Airport_ID 
-            AND 
-            AND ap.Airport_ID = 'Canada')
+select countries.country, COUNT(*)
+from
+(      SELECT ap2.country
+      FROM airports ap,  routes r, airports ap2
+      WHERE r.destination_airport_ID = ap.airport_id and ap.country = "Canada" and 
+            r.source_airport_ID = ap2.airport_id 
       UNION ALL
-      (SELECT ap.country
-      FROM Airport ap, airline al, routes r
-      WHERE r.Airline_ID = al.Airline_ID AND r.Destination_airport_ID = ap.Airport_ID
-            AND ap.Airport_ID = 'Canada')
-   )
-GROUP BY ap.country;
-
-
+      SELECT ap9.country 
+      FROM airports ap8,  routes r8, airports ap9
+      WHERE r8.source_airport_ID = ap8.airport_id and ap8.country = "Canada" and 
+            r8.destination_airport_ID = ap9.airport_id ) as countries
+group by countries.country
 /*
 Q4 (10 pts)
 
