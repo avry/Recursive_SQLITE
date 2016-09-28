@@ -83,20 +83,20 @@ double rad2deg(double rad) {
 
 
 
-  char airline[10] = {"", "", "", "", "", "", "", "", "", ""};
-  char airline_id[10] = {"", "", "", "", "", "", "", "", "", ""} ;
-  char source_airport[10]= {"", "", "", "", "", "", "", "", "", ""};
-  char source_airport_id[10]= {"", "", "", "", "", "", "", "", "", ""};
-  char destination_airport[10]= {"", "", "", "", "", "", "", "", "", ""};
-  char destination_airport_id[10]= {"", "", "", "", "", "", "", "", "", ""};
-  char codeshare[10]= {"", "", "", "", "", "", "", "", "", ""};
-  int stops[10] = {0,0,0,0,0,0,0,0,0,0};
-  char equipment[10]= {"", "", "", "", "", "", "", "", "", ""};
-  double ap1_latitude[10] = {0,0,0,0,0,0,0,0,0,0};
-  double ap1_longitude[10]= {0,0,0,0,0,0,0,0,0,0};
-  double ap2_latitude[10]= {0,0,0,0,0,0,0,0,0,0};
-  double ap2_longitude[10]= {0,0,0,0,0,0,0,0,0,0};
-  double flight_distance[10]= {0,0,0,0,0,0,0,0,0,0};
+  char airline[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
+  char airline_id[10][256] //= {"", "", "", "", "", "", "", "", "", ""} ;
+  char source_airport[10][256]//= {"", "", "", "", "", "", "", "", "", ""};
+  char source_airport_id[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
+  char destination_airport[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
+  char destination_airport_id[10] [256] //= {"", "", "", "", "", "", "", "", "", ""};
+  char codeshare[10] [256] //= {"", "", "", "", "", "", "", "", "", ""};
+  int stops[10] //= {0,0,0,0,0,0,0,0,0,0};
+  char equipment[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
+  double ap1_latitude[10]  //= {0,0,0,0,0,0,0,0,0,0};
+  double ap1_longitude[10] //= {0,0,0,0,0,0,0,0,0,0};
+  double ap2_latitude[10] //= {0,0,0,0,0,0,0,0,0,0};
+  double ap2_longitude[10] //= {0,0,0,0,0,0,0,0,0,0};
+  double flight_distance[10]  //= {0,0,0,0,0,0,0,0,0,0};
 
 
 
