@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 "      SELECT ap9.country "\
 "      FROM airports ap8,  routes r8, airports ap9"\
 "      WHERE r8.source_airport_ID = ap8.airport_id and ap8.country = \"Canada\" and "\
-"            r8.destination_airport_ID = ap9.airport_id ) as countries"
+"            r8.destination_airport_ID = ap9.airport_id ) as countries"\
 "group by countries.country";
 
    /* Execute SQL statement */
