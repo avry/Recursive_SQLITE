@@ -26,11 +26,11 @@ int main(int argc, char **argv){
                                     "FROM cnt cn, routes r1 "\
                                     "WHERE r1.source_airport_ID = cn.id "\
                               ") "\
-                              "SELECT COUNT(*) FROM ( "\
+                              //"SELECT COUNT(*) FROM ( "\
                               "SELECT ap1.airport_id, ap1.IATA_FAA "\
                               "FROM airports ap1 "\
                               "EXCEPT "\
-                              "SELECT id, iata from cnt);";
+                              "SELECT id, iata from cnt;";
                         							
     //strcpy(sql_statement, argv[1]);
     strcpy(sql_statement, sql_statement1);

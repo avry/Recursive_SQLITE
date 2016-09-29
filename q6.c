@@ -4,42 +4,44 @@
 #include <sqlite3.h>
 
 int main(int argc, char **argv){
-	sqlite3 *db; //the database
-	sqlite3_stmt *stmt; //the update statement
+  sqlite3 *db; //the database
+  sqlite3_stmt *stmt; //the update statement
   char database_name[25] = "openflights.db";
 
   char sql_statement[999] =  "WITH RECURSIVE "\
-            						      "cnt(id, iata, level) AS ( "\
-            						            "SELECT r.Destination_airport_ID, r.Destination_airport, 0 "\
-            						            "FROM routes r "\
-            						            "WHERE r.source_airport = \"YEG\" "\
-            						                  "UNION "\
-            						            "SELECT r1.Destination_airport_ID, r1.Destination_airport, cn.level+1 "\
-            						            "FROM cnt cn, routes r1 "\
-            						            "WHERE r1.source_airport_ID = cn.id AND cn.level = 1 or cn.level = 2 or cn.level =3 "\
+                              "cnt(id, iata, level) AS ( "\
+                                    "SELECT r.Destination_airport_ID, r.Destination_airport, 0 "\
+                                    "FROM routes r "\
+                                    "WHERE r.source_airport = \"YEG\" "\
+                                          "UNION "\
+                                    "SELECT r1.Destination_airport_ID, r1.Destination_airport, cn.level+1 "\
+                                    "FROM cnt cn, routes r1 "\
+                                    "WHERE r1.source_airport_ID = cn.id AND cn.level = 1 or cn.level = 2 or cn.level =3 "\
                                     //"ORDER BY 2 DESC "\
                                     
-            						      ") "\
-                              "SELECT id from cnt;";
-            						      //"SELECT COUNT(*) FROM (SELECT id from cnt);";
+                              ") "\
+                              "SELECT ap66.* "\
+                              "FROM airports ap66, cnt cn66" \
+                              "WHERE cn66.id = ap66.airport_id;";
+                              //"SELECT COUNT(*) FROM (SELECT id from cnt);";
 
 
-  	int rc;
+    int rc;
 
-  	/*if( argc!=3 ){
-    	fprintf(stderr, "Usage: %s <database file> <select query>\n", argv[0]);
-    	return(1);
-  	}*/
+    /*if( argc!=3 ){
+      fprintf(stderr, "Usage: %s <database file> <select query>\n", argv[0]);
+      return(1);
+    }*/
 
-  	rc = sqlite3_open(database_name, &db);
-  	if( rc ){
-    	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-    	sqlite3_close(db);
-    	return(1);
-  	}
-  	//char *sql_stmt = sql_statement;
+    rc = sqlite3_open(database_name, &db);
+    if( rc ){
+      fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+      sqlite3_close(db);
+      return(1);
+    }
+    //char *sql_stmt = sql_statement;
 
-  	rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0);
+    rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0);
 
     if (rc != SQLITE_OK) {  
         fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
