@@ -114,10 +114,18 @@ Write a C program, in a file called q6.c that prints the list of
 airports that can be reached from YEG with at most 3 connections.
 */
 
-SELECT 
-FROM 
-WHERE 
-
+WITH RECURSIVE 
+      cnt(id, name) AS ( 
+            SELECT r.Destination_airport_ID, r.Destination_airport 
+            FROM routes r 
+            WHERE r.source_airport = "YEG" 
+                  UNION 
+            SELECT r1.Destination_airport_ID 
+            FROM routes r1
+            WHERE r1.source_airport_ID = cnt.id
+            LIMIT 3
+      )
+      SELECT id, name from cnt;
 
 
 /*
@@ -126,10 +134,17 @@ Q7 (15 pts)
 Write a C program, in a file called q7.c that prints the highest 
 airport(s) that one can reach from YEG, regardless of the number of connections.
 */
-
-SELECT
-FROM
-WHERE
+WITH RECURSIVE 
+      cnt(id, name) AS ( 
+            SELECT r.Destination_airport_ID, r.Destination_airport 
+            FROM routes r 
+            WHERE r.source_airport = "YEG" 
+                  UNION 
+            SELECT r1.Destination_airport_ID 
+            FROM routes r1
+            WHERE r1.source_airport_ID = cnt.id
+      )
+      SELECT id, name from cnt;
 
 
 
@@ -141,10 +156,20 @@ with commercial flights into (or out of) them, but yet cannot be reached
 flying from from YEG regardless of the number of connections.
 */
 
-SELECT 
-FROM
-WHERE
-
+SELECT ap.name, ap.airport_id
+FROM airports ap
+EXCEPT
+WITH RECURSIVE 
+      cnt(id, name) AS ( 
+            SELECT r.Destination_airport_ID, r.Destination_airport 
+            FROM routes r 
+            WHERE r.source_airport = "YEG" 
+                  UNION 
+            SELECT r1.Destination_airport_ID 
+            FROM routes r1
+            WHERE r1.source_airport_ID = cnt.id
+      )
+      SELECT id, name from cnt;
 
 
 
@@ -157,9 +182,20 @@ code as a parameter and produces the equivalent answer of question 8
 above for that airport.
 */
 
-SELECT 
-FROM
-WHERE
+SELECT ap1.name, ap1.airport_id
+FROM airports ap
+EXCEPT
+WITH RECURSIVE 
+      cnt(id, name) AS ( 
+            SELECT r.Destination_airport_ID, r.Destination_airport 
+            FROM routes r , airports ap
+            WHERE r.airport_id = ap.airport_id AND ap.IATA_FAA = "%s"
+                  UNION 
+            SELECT r1.Destination_airport_ID 
+            FROM routes r1
+            WHERE r1.source_airport_ID = cnt.id
+      )
+      SELECT id, name from cnt;
 
 
 
