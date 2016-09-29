@@ -20,8 +20,8 @@ int main(int argc, char **argv){
                                     //"ORDER BY 2 DESC "\
                                     
             						      ") "\
-                              "SELECT id from cnt;";
-            						      //"SELECT COUNT(*) FROM (SELECT id from cnt);";
+                              //"SELECT id from cnt;";
+            						      "SELECT COUNT(*) FROM (SELECT id from cnt);";
 
 
   	int rc;

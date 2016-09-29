@@ -8,7 +8,7 @@ int main(int argc, char **argv){
 	sqlite3_stmt *stmt; //the update statement
   char database_name[25] = "openflights.db";
 
-  char sql_statement[999] =  "SELECT r.airline, r.Airline_ID, r.source_airport, r.source_airport_ID," \
+  char sql_statement[999] =  "SELECT COUNT(*) FROM (SELECT r.airline, r.Airline_ID, r.source_airport, r.source_airport_ID," \
                                     "r.Destination_airport, r.Destination_airport_ID, r.codeshare, "\
                                     "r.stops, r.equipment  FROM airlines al, routes r WHERE r.Airline_ID = " \
                                     "al.Airline_ID AND al.active = 'Y' AND al.ICAO IS NOT NULL AND " \
@@ -26,7 +26,7 @@ int main(int argc, char **argv){
                             "FROM  airports ap6, airports ap7, routes r6 "\
                             "WHERE r6.destination_airport_id = ap6.airport_id and "\
                                   "r6.source_airport_ID = ap7.airport_id "\
-                                  "and ap7.country = ap6.country;";
+                                  "and ap7.country = ap6.country);";
 
 
   	int rc;
