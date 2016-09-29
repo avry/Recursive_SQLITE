@@ -171,8 +171,20 @@ WITH RECURSIVE
       )
       SELECT id, name from cnt;
 
-
-
+WITH RECURSIVE 
+      cnt(id, name) AS ( 
+            SELECT r.Destination_airport_ID, r.Destination_airport 
+            FROM routes r 
+            WHERE r.source_airport = "YEG" 
+                  UNION 
+            SELECT r1.Destination_airport_ID 
+            FROM routes r1
+            WHERE r1.source_airport_ID = cnt.id
+      )
+SELECT ap.name, ap.airport_id
+FROM airports ap
+EXCEPT
+SELECT id, name from cnt;
 
 /*
 Q9 (15 pts)

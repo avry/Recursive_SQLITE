@@ -83,25 +83,27 @@ double rad2deg(double rad) {
 
 
 
-  char airline[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
-  char airline_id[10][256] //= {"", "", "", "", "", "", "", "", "", ""} ;
-  char source_airport[10][256]//= {"", "", "", "", "", "", "", "", "", ""};
-  char source_airport_id[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
-  char destination_airport[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
-  char destination_airport_id[10] [256] //= {"", "", "", "", "", "", "", "", "", ""};
-  char codeshare[10] [256] //= {"", "", "", "", "", "", "", "", "", ""};
-  int stops[10] //= {0,0,0,0,0,0,0,0,0,0};
-  char equipment[10][256] //= {"", "", "", "", "", "", "", "", "", ""};
-  double ap1_latitude[10]  //= {0,0,0,0,0,0,0,0,0,0};
-  double ap1_longitude[10] //= {0,0,0,0,0,0,0,0,0,0};
-  double ap2_latitude[10] //= {0,0,0,0,0,0,0,0,0,0};
-  double ap2_longitude[10] //= {0,0,0,0,0,0,0,0,0,0};
-  double flight_distance[10]  //= {0,0,0,0,0,0,0,0,0,0};
+  //char* airline; //= {"", "", "", "", "", "", "", "", "", ""};
+  // char airline_id[10][256]; //= {"", "", "", "", "", "", "", "", "", ""} ;
+  // char source_airport[10][256];//= {"", "", "", "", "", "", "", "", "", ""};
+  // char source_airport_id[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
+  // char destination_airport[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
+  // char destination_airport_id[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
+  // char codeshare[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
+  // int stops[10]; //= {0,0,0,0,0,0,0,0,0,0};
+  // char equipment[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
+  // double ap1_latitude[10];  //= {0,0,0,0,0,0,0,0,0,0};
+  // double ap1_longitude[10]; //= {0,0,0,0,0,0,0,0,0,0};
+  // double ap2_latitude[10]; //= {0,0,0,0,0,0,0,0,0,0};
+  // double ap2_longitude[10]; //= {0,0,0,0,0,0,0,0,0,0};
+  // double flight_distance[10];  //= {0,0,0,0,0,0,0,0,0,0};
 
 
 
 
 int main(int argc, char **argv){
+  char airline;
+
 	sqlite3 *db; //the database
 	sqlite3_stmt *stmt; //the update statement
   char database_name[25] = "openflights.db";
@@ -137,58 +139,12 @@ int main(int argc, char **argv){
     }    
     int count = 0;
 
-    while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-        int col;
-        for(col=0; col<sqlite3_column_count(stmt)-1; col++) {
-          if (count < 10){
-            switch (col) {
-              case 0:
-                //printf("%s ", sqlite3_column_text(stmt, col));
-                strncpy(airline[count], (char *) sqlite3_column_text(stmt, col), sizeof((char *) sqlite3_column_text(stmt, col)) );
-                break;
-              case 1:
-                strncpy(airline_id[count], (char *) sqlite3_column_text(stmt, col), sizeof((char *) sqlite3_column_text(stmt, col)));
-                break;
-              case 2:
-                //printf("%s ", sqlite3_column_text(stmt, col));
-                strncpy(source_airport[count] , (char *) sqlite3_column_text(stmt, col) , sizeof((char *) sqlite3_column_text(stmt, col)));
-                break;
-              case 3:
-                //printf("%s\n", sqlite3_column_text(stmt, col));
-                strncpy(source_airportid[count] , (char *) sqlite3_column_text(stmt, col), sizeof((char *) sqlite3_column_text(stmt, col)));
-                break;
-              case 4:
-                strncpy(destination_airport[count] ,(char *) sqlite3_column_text(stmt, col), sizeof((char *) sqlite3_column_text(stmt, col)));
-                break;
-              case 5:
-                strncpy(destination_airport_id[count] ,(char *) sqlite3_column_text(stmt, col), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-              case 6:
-                strncpy(codeshare[count] , (char *) sqlite3_column_text(stmt, col), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-              case 7:
-                strncpy(stops[count] , atoi((char *) sqlite3_column_text(stmt, col)), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-              case 8:
-                strncpy(equipment[count], (char *) sqlite3_column_text(stmt, col), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-              case 9:
-                strncpy(ap1_latitude[count] , atof((char *) sqlite3_column_text(stmt, col)), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-              case 10:
-                strncpy(ap1_longitude[count] , atof((char *) sqlite3_column_text(stmt, col)), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-              case 11:
-                strncpy(ap2_latitude[count] ,atof((char *) sqlite3_column_text(stmt, col)), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-              case 12:
-                strncpy(ap2_longitude[count] , atof((char *) sqlite3_column_text(stmt, col)), sizeof((char *) sqlite3_column_text(stmt, col))); 
-                break;
-            }
-          }
+      while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        if (count < 10){
+          airline = (char *) sqlite3_column_text(stmt, 0);
+          printf("%s", airline);
         }
-        count = count +1;
-
+        count = count + 1;
     }
 
     sqlite3_finalize(stmt); //always finalize a statement
