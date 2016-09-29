@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <sqlite3.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*::                                                                         :*/
@@ -80,42 +82,26 @@ double rad2deg(double rad) {
 //######################################################################################################
 
 
-
-
-
-  //char* airline; //= {"", "", "", "", "", "", "", "", "", ""};
-  // char airline_id[10][256]; //= {"", "", "", "", "", "", "", "", "", ""} ;
-  // char source_airport[10][256];//= {"", "", "", "", "", "", "", "", "", ""};
-  // char source_airport_id[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
-  // char destination_airport[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
-  // char destination_airport_id[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
-  // char codeshare[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
-  // int stops[10]; //= {0,0,0,0,0,0,0,0,0,0};
-  // char equipment[10][256]; //= {"", "", "", "", "", "", "", "", "", ""};
-  // double ap1_latitude[10];  //= {0,0,0,0,0,0,0,0,0,0};
-  // double ap1_longitude[10]; //= {0,0,0,0,0,0,0,0,0,0};
-  // double ap2_latitude[10]; //= {0,0,0,0,0,0,0,0,0,0};
-  // double ap2_longitude[10]; //= {0,0,0,0,0,0,0,0,0,0};
-  // double flight_distance[10];  //= {0,0,0,0,0,0,0,0,0,0};
-
-
-
-
 int main(int argc, char **argv){
-  char airline;
-
+  char database_name[25] = "openflights.db";
 	sqlite3 *db; //the database
 	sqlite3_stmt *stmt; //the update statement
-  char database_name[25] = "openflights.db";
-
+  sqlite3_stmt *stmt_update;
+  
   char sql_statement[999] =  "SELECT r1.* , ap1.latitude, ap1.longitude, ap2.latitude, "\
                                       "ap2.longitude "\
                               "FROM routes r1, airports ap1, airports ap2 "\
                               "WHERE r1.source_airport_ID = ap1.airport_id and " \
                                     "r1.destination_airport_ID = ap2.airport_id ";
-
+  char sql_insert1[] = "insert into route_destination values (";
+  char comma[] = ",";
+  char quotation[] = "\"";
+  char sql_insert2[] = ")";
+  char sql_insert_final[999];
+  strcpy(sql_insert_final , sql_insert1);
 
   	int rc;
+    int rc_insert;
 
   	/*if( argc!=3 ){
     	fprintf(stderr, "Usage: %s <database file> <select query>\n", argv[0]);
@@ -130,21 +116,40 @@ int main(int argc, char **argv){
   	}
   	//char *sql_stmt = sql_statement;
 
-  	rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0);
+  	rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0); //opening database to get all queries of flights
+    //rc_insert = sqlite3_prepare_v2(db, sql_add_tuple, -1, &stmt_update, 0);
 
     if (rc != SQLITE_OK) {  
         fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return 1;
-    }    
-    int count = 0;
-
+    }
       while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-        if (count < 10){
-          airline = (char *) sqlite3_column_text(stmt, 0);
-          printf("%s", airline);
+        strcpy(sql_insert_final , sql_insert1);
+        int col;
+        for(col=0; col<sqlite3_column_count(stmt)-1; col++) {
+          strncat(sql_insert_final, quotation, sizeof(quotation));
+          strncat(sql_insert_final,sqlite3_column_text(stmt, col), sizeof(sqlite3_column_text(stmt, col)));
+          strncat(sql_insert_final, quotation, sizeof(quotation));
+          strncat(sql_insert_final, comma, sizeof(comma));
+          //printf("%s|", sqlite3_column_text(stmt, col));
         }
-        count = count + 1;
+        strncat(sql_insert_final, quotation, sizeof(quotation));
+        strncat(sql_insert_final,sqlite3_column_text(stmt, col), sizeof(sqlite3_column_text(stmt, col)));
+        strncat(sql_insert_final, quotation, sizeof(quotation));
+        //printf("%s", sqlite3_column_text(stmt, col));
+
+        strncat(sql_insert_final, sql_insert2, sizeof(sql_insert2));
+
+        rc_insert = sqlite3_prepare_v2(db, sql_insert_final, -1, &stmt_update, 0);
+        if ((rc_insert = sqlite3_step(stmt_update)) != SQLITE_DONE){
+          fprintf(stderr, "Update failed: %s\n", sqlite3_errmsg(db));
+          sqlite3_close(db);
+          return 1;     
+        }
+
+        strcpy(sql_insert_final,"");
+
     }
 
     sqlite3_finalize(stmt); //always finalize a statement
