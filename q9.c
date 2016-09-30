@@ -41,10 +41,10 @@ int main(int argc, char **argv){
                                         "and al6.icao is not null and al6.callsign is not null and "\
                                         "al6.country is not null "\
                             ") "\
-                            "SELECT ap1.airport_id, ap1.IATA_FAA "\
+                            "SELECT ap1.airport_id "\
                             "FROM airports ap1 "\
                             "EXCEPT "\
-                            "SELECT id, iata from cnt;";
+                            "SELECT id from cnt;";
   
   //assembling our query                                  
   strcpy(sql_statement, sql_statement1);

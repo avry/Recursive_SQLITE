@@ -116,7 +116,7 @@ int main(int argc, char **argv){
                               "FROM routes r1, airports ap1, airports ap2, airlines al "\
                               "WHERE r1.source_airport_ID = ap1.airport_id and " \
                                     "r1.destination_airport_ID = ap2.airport_id "\
-                                    "and al.airline_id = r.airline_id and "\
+                                    "and al.airline_id = r1.airline_id and "\
                                     "al.iata is not null and al.icao is not null "\
                                     "and al.callsign is not null and al.country is not null;";
 

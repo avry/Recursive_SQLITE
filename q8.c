@@ -19,7 +19,7 @@ int main(int argc, char **argv){
   char sql_statement[999] = "WITH RECURSIVE "\
                             "cnt(id, name) AS ( "\
                                   "SELECT r.Destination_airport_ID, r.Destination_airport "\
-                                  "FROM routes r , airlines al"\
+                                  "FROM routes r , airlines al "\
                                   "WHERE r.source_airport = \"YEG\" "\
                                         "and r.airline_id = al.airline_id and "\
                                         "al.iata is not null and al.icao is not null "\
