@@ -28,9 +28,9 @@ int main(int argc, char **argv){
                                     "ORDER BY 2 DESC "\
                                     
                               ") "\
-                              "SELECT ap66.name "\
+                              "select count(*) from (SELECT DISTINCT ap66.name "\
                               "FROM airports ap66, cnt cn66 "\
-                              "WHERE cn66.id = ap66.airport_id;";
+                              "WHERE cn66.id = ap66.airport_id);";
 
 
   int rc;
