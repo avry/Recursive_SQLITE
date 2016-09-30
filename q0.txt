@@ -1,5 +1,5 @@
 
-sqlite3 openflights
+sqlite3 openflights.db
 
 
 CREATE TABLE airports(

@@ -8,7 +8,21 @@ int main(int argc, char **argv){
 	sqlite3_stmt *stmt; //the update statement
   char database_name[25] = "openflights.db";
 
-  char sql_statement[999] =  "select countries.country, COUNT(*) "\
+  char sql_statement[999] = "select al_country.country, COUNT(*) "\
+                            "from "\
+                            "(SELECT DISTINCT al66.name,al66.country "\
+                            "FROM airports ap,  routes r, airports ap2, airlines al66 "\
+                            "WHERE al66.airline_id = r.airline_id AND r.destination_airport_ID = "\
+                                  "ap.airport_id and "\
+                                  "r.source_airport_ID = ap2.airport_id "\
+                                  "and (ap.country = \"Canada\" or  ap2.country = \"Canada\")) as al_country "\
+                            "GROUP BY al_country.country ORDER BY COUNT(*) DESC LIMIT 10; ";
+
+
+
+
+
+                             /* "select countries.country, COUNT(*) "\
                               "from "\
                               "(    SELECT ap2.country "\
                                     "FROM airports ap,  routes r, airports ap2 "\
@@ -22,7 +36,7 @@ int main(int argc, char **argv){
                                           "ap8.country = \"Canada\" and "\
                                           "r8.destination_airport_ID = ap9.airport_id ) as countries "\
                               "group by countries.country order by count(*) DESC limit 10;";
-
+                              */
 
   	int rc;
 

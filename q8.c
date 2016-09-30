@@ -19,10 +19,10 @@ int main(int argc, char **argv){
 							            "WHERE r1.source_airport_ID = cn.id "\
 							      ") "\
 							//"SELECT COUNT(*) FROM (SELECT ap.airport_id from airports ap);";
-							"SELECT ap.airport_id "\
+							"select count(*) from (SELECT ap.airport_id "\
 							"FROM airports ap "\
 							"EXCEPT "\
-							"SELECT id from cnt;";
+							"SELECT id from cnt);";
 							
 
 

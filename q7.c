@@ -18,9 +18,9 @@ int main(int argc, char **argv){
                                     "FROM cnt cn, routes r1 "\
                                     "WHERE r1.source_airport_ID = cn.id "\
                               ") "\
-                              "SELECT ap66.* "\
-                              "FROM airports ap66, cnt cn66" \
-                              "WHERE cn66.id = ap66.airport_id;";
+                              "select count(*) from (SELECT ap66.* "\
+                              "FROM airports ap66, cnt cn66 "\
+                              "WHERE cn66.id = ap66.airport_id);";
 
 
     int rc;
