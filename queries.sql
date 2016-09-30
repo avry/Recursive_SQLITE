@@ -42,6 +42,8 @@ WHERE r6.destination_airport_id = ap6.airport_id and r6.source_airport_ID = ap7.
       )
 
 
+
+
 /* result is 1862 records*/
 
 
@@ -64,6 +66,23 @@ from
       WHERE r8.source_airport_ID = ap8.airport_id and ap8.country = "Canada" and 
             r8.destination_airport_ID = ap9.airport_id ) as countries
 group by countries.country order by count(*) DESC limit 10;
+
+
+
+
+
+#final form of question 3
+select al_country.country, COUNT(*)
+from 
+(SELECT DISTINCT al66.name,al66.country
+FROM airports ap,  routes r, airports ap2, airlines al66
+WHERE al66.airline_id = r.airline_id AND r.destination_airport_ID = 
+      ap.airport_id and 
+      r.source_airport_ID = ap2.airport_id 
+      and (ap.country = "Canada" or  ap2.country = "Canada")) as al_country
+GROUP BY al_country.country ORDER BY COUNT(*) DESC LIMIT 10;
+
+
 
 /*
 Canada|2298
