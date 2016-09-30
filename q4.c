@@ -82,77 +82,110 @@ double rad2deg(double rad) {
 //######################################################################################################
 
 
+
+
+
+
+
 int main(int argc, char **argv){
+  char* airline[10] = {"","","","","","","","","",""};
+  char* source_airport[10] = {"","","","","","","","","",""};
+  char* destination_airport[10] = {"","","","","","","","","",""};
+  char* equipment[10]= {"","","","","","","","","",""};
+  double geodistance[10]={0,0,0,0,0,0,0,0,0,0};
+  double geo_comparator;
+  int count=0;
+  double source_lat = 0;
+  double source_lon = 0;
+  double dest_lat = 0;
+  double dest_lon = 0;
   char database_name[25] = "openflights.db";
 	sqlite3 *db; //the database
 	sqlite3_stmt *stmt; //the update statement
-  sqlite3_stmt *stmt_update;
   
   char sql_statement[999] =  "SELECT r1.* , ap1.latitude, ap1.longitude, ap2.latitude, "\
                                       "ap2.longitude "\
                               "FROM routes r1, airports ap1, airports ap2 "\
                               "WHERE r1.source_airport_ID = ap1.airport_id and " \
                                     "r1.destination_airport_ID = ap2.airport_id ";
-  char sql_insert1[] = "insert into route_destination values (";
-  char comma[] = ",";
-  char quotation[] = "\"";
-  char sql_insert2[] = ")";
-  char sql_insert_final[999];
-  strcpy(sql_insert_final , sql_insert1);
 
-  	int rc;
-    int rc_insert;
+	int rc;
 
-  	/*if( argc!=3 ){
-    	fprintf(stderr, "Usage: %s <database file> <select query>\n", argv[0]);
-    	return(1);
-  	}*/
 
-  	rc = sqlite3_open(database_name, &db);
-  	if( rc ){
-    	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-    	sqlite3_close(db);
-    	return(1);
-  	}
-  	//char *sql_stmt = sql_statement;
+	rc = sqlite3_open(database_name, &db);
+	if( rc ){
+  	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+  	sqlite3_close(db);
+  	return(1);
+	}
+	rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0); //opening database to get all queries of flights
 
-  	rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0); //opening database to get all queries of flights
-    //rc_insert = sqlite3_prepare_v2(db, sql_add_tuple, -1, &stmt_update, 0);
+  if (rc != SQLITE_OK) {  
+      fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
+      sqlite3_close(db);
+      return 1;
+  }
 
-    if (rc != SQLITE_OK) {  
-        fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-        return 1;
-    }
-      while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-        strcpy(sql_insert_final , sql_insert1);
-        int col;
-        for(col=0; col<sqlite3_column_count(stmt)-1; col++) {
-          strncat(sql_insert_final, quotation, sizeof(quotation));
-          strncat(sql_insert_final,sqlite3_column_text(stmt, col), sizeof(sqlite3_column_text(stmt, col)));
-          strncat(sql_insert_final, quotation, sizeof(quotation));
-          strncat(sql_insert_final, comma, sizeof(comma));
-          //printf("%s|", sqlite3_column_text(stmt, col));
+  while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+    if (count < 10){
+      airline[count] = strdup((char *) sqlite3_column_text(stmt, 0));
+      source_airport[count] = strdup((char *) sqlite3_column_text(stmt, 2));
+      destination_airport[count] = strdup((char *) sqlite3_column_text(stmt, 4));
+      equipment[count]= strdup((char *) sqlite3_column_text(stmt, 8));
+      source_lat = atof((char *) sqlite3_column_text(stmt, 9));
+      source_lon = atof((char *) sqlite3_column_text(stmt, 10));
+      dest_lat = atof((char *) sqlite3_column_text(stmt, 11));
+      dest_lon = atof((char *) sqlite3_column_text(stmt, 12));
+      geodistance[count]= distance( source_lat, source_lon ,dest_lat,dest_lon,'K');
+      count = count + 1;
+    } 
+    else{
+      double min_distance = 1000000000;
+      int min_index;
+      count = 0;
+      while (count < 10){
+        if (geodistance[count] < min_distance){
+          min_distance = geodistance[count];
+          min_index = count;
         }
-        strncat(sql_insert_final, quotation, sizeof(quotation));
-        strncat(sql_insert_final,sqlite3_column_text(stmt, col), sizeof(sqlite3_column_text(stmt, col)));
-        strncat(sql_insert_final, quotation, sizeof(quotation));
-        //printf("%s", sqlite3_column_text(stmt, col));
+        count = count +1;
+      }
+      //printf("min is  %lf", min_distance);
 
-        strncat(sql_insert_final, sql_insert2, sizeof(sql_insert2));
+      source_lat = atof((char *) sqlite3_column_text(stmt, 9));
+      source_lon = atof((char *) sqlite3_column_text(stmt, 10));
+      dest_lat = atof((char *) sqlite3_column_text(stmt, 11));
+      dest_lon = atof((char *) sqlite3_column_text(stmt, 12));
+      geo_comparator= distance( source_lat, source_lon ,dest_lat,dest_lon,'K');
 
-        rc_insert = sqlite3_prepare_v2(db, sql_insert_final, -1, &stmt_update, 0);
-        if ((rc_insert = sqlite3_step(stmt_update)) != SQLITE_DONE){
-          fprintf(stderr, "Update failed: %s\n", sqlite3_errmsg(db));
-          sqlite3_close(db);
-          return 1;     
-        }
-
-        strcpy(sql_insert_final,"");
-
+      if (geo_comparator > min_distance){
+        airline[min_index] = strdup((char *) sqlite3_column_text(stmt, 0));
+        source_airport[min_index] = strdup((char *) sqlite3_column_text(stmt, 2));
+        destination_airport[min_index] = strdup((char *) sqlite3_column_text(stmt, 4));
+        equipment[min_index]= strdup((char *) sqlite3_column_text(stmt, 8));
+        source_lat = atof((char *) sqlite3_column_text(stmt, 9));
+        source_lon = atof((char *) sqlite3_column_text(stmt, 10));
+        dest_lat = atof((char *) sqlite3_column_text(stmt, 11));
+        dest_lon = atof((char *) sqlite3_column_text(stmt, 12));
+        geodistance[min_index]= distance( source_lat, source_lon ,dest_lat,dest_lon,'K');
+      }
+      count = count +1;
     }
+  }
+  int i = 0;
+  while (i < 10){
+    printf("%s\n",airline[i]);
+    printf("%s\n",source_airport[i]) ;
+    printf("%s\n",destination_airport[i] );
+    printf("%s\n",equipment[i]);
+    printf("%lf\n\n\n",geodistance[i]);
+    i = i +1;
+  }
 
-    sqlite3_finalize(stmt); //always finalize a statement
+
+
+
+  sqlite3_finalize(stmt); //always finalize a statement
 }
 
 
