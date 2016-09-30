@@ -21,10 +21,10 @@ int main(int argc, char **argv){
                                     "SELECT r.Destination_airport_ID, r.Destination_airport, 1 "\
                                     "FROM routes r "\
                                     "WHERE r.source_airport = \"YEG\" "\
-                                          "UNION ALL "\
+                                          "UNION "\
                                     "SELECT r1.Destination_airport_ID, r1.Destination_airport, cn.level+1 "\
                                     "FROM cnt cn, routes r1 "\
-                                    "WHERE r1.source_airport_ID = cn.id AND (cn.level = 1 or cn.level = 2 or cn.level =3) "\
+                                    "WHERE r1.source_airport_ID = cn.id AND (cn.level = 1 or cn.level = 2 or cn.level = 3 ) "\
                                     "ORDER BY 2 DESC "\
                                     
                               ") "\
