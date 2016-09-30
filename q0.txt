@@ -44,6 +44,11 @@ CREATE TABLE routes (
    FOREIGN KEY (Destination_airport_ID) REFERENCES airports(Airport_ID)
 );
 
+CREATE TABLE aircraft(
+   airplane VARCHAR(10)
+);
+
+
 .separator ","
 
 .import airports.dat airports

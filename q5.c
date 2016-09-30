@@ -100,16 +100,19 @@ int main(int argc, char **argv){
   sqlite3_stmt *stmt_cr;
   sqlite3_stmt *stmt_in;
   sqlite3_stmt *stmt_re;
-  
+  sqlite3_stmt *stmt_dr; 
   char sql_statement[999] =  "SELECT r1.* , ap1.latitude, ap1.longitude, ap2.latitude, "\
                                       "ap2.longitude "\
                               "FROM routes r1, airports ap1, airports ap2 "\
                               "WHERE r1.source_airport_ID = ap1.airport_id and " \
                                     "r1.destination_airport_ID = ap2.airport_id ";
-  char sql_create_table[999] = "CREATE TABLE long_distance_aircraft(airplane VARCHAR(10));" ;                                
+  //char sql_create_table[999] = "CREATE TABLE aircraft(airplane VARCHAR(10));" ;       
+  char sql_final_insert[999];                         
 	int rc;
-  int rc_1;
+  //int rc_1;
   int rc_2;
+  int rc_3;
+  int rc_4;
 
 
 	rc = sqlite3_open(database_name, &db);
@@ -119,32 +122,36 @@ int main(int argc, char **argv){
   	return(1);
 	}
 	rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0); //opening database to get all queries of flights
-  rc_1 = sqlite3_prepare_v2(db, sql_create_table, -1, &stmt_cr, 0);
 
 
-  
+  //rc_1 = sqlite3_prepare_v2(db, sql_create_table, -1, &stmt_cr, 0);
+
+  // if (rc_1 != SQLITE_OK) {  
+  //     fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
+  //     sqlite3_close(db);
+  //     return 1;
+  //   }
+  // //creating a new long distance plane table
+  // if ((rc_1 = sqlite3_step(stmt_cr)) != SQLITE_DONE){
+  //     fprintf(stderr, "Update kase failed: %s\n", sqlite3_errmsg(db));
+  //     sqlite3_close(db);
+  //     return 1;     
+  // }
+
 
   if (rc != SQLITE_OK) {  
     fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
     return 1;
   }
-  if (rc_1 != SQLITE_OK) {  
-      fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
-      sqlite3_close(db);
-      return 1;
-    }
-  //creating a new long distance plane table
-  if ((rc_1 = sqlite3_step(stmt_cr)) != SQLITE_DONE){
-      fprintf(stderr, "Update failed: %s\n", sqlite3_errmsg(db));
-      sqlite3_close(db);
-      return 1;     
-  }
 
 
   while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-    char quotation[] = "\"";
-    char sql_insert_first[500] = "INSERT INTO long_distance_aircraft(airplane) values (\"";
+    //char quotation[] = "\"";
+    char sql_insert_first[] = "INSERT INTO aircraft (airplane) values (\"";
+    char sql_ender[] = "\");";
+
+
     source_lat = atof((char *) sqlite3_column_text(stmt, 9));
     source_lon = atof((char *) sqlite3_column_text(stmt, 10));
     dest_lat = atof((char *) sqlite3_column_text(stmt, 11));
@@ -152,41 +159,70 @@ int main(int argc, char **argv){
     geo_comparator= distance( source_lat, source_lon ,dest_lat,dest_lon,'K');
 
     if (geo_comparator > 10000){
-      equipment= strdup( sqlite3_column_text(stmt, 8));
-      strncat(sql_insert_first, equipment, sizeof(equipment));
-      strncat(sql_insert_first, quotation, sizeof(quotation));
-      rc_2 = sqlite3_prepare_v2(db, sql_insert_first, -1, &stmt_in, 0);
-      if (rc_2 != SQLITE_OK) {  
-        fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-        return 1;
-      }
-      if ((rc_2 = sqlite3_step(stmt_cr)) != SQLITE_DONE){
-        fprintf(stderr, "Update failed: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-        return 1;     
+      char with_space[100];
+      char *pch;
+      char opt1;
+      char opt2;
+      strcpy (with_space, sqlite3_column_text(stmt, 8));
+      pch = strtok(with_space, " ");
+      while (pch != NULL){
+        strcpy(sql_final_insert, sql_insert_first);
+        //strncat(sql_final_insert, sqlite3_column_text(stmt, 8), sizeof(sqlite3_column_text(stmt, 8)));
+        strncat(sql_final_insert, pch, sizeof(pch));
+        strncat(sql_final_insert, sql_ender, sizeof(sql_ender));
+        //strncat(sql_insert_first, quotation, sizeof(quotation));
+        rc_2 = sqlite3_prepare_v2(db, sql_final_insert, -1, &stmt_in, 0);
+        if (rc_2 != SQLITE_OK) {  
+          fprintf(stderr, "Preparation failed here: %s\n", sqlite3_errmsg(db));
+          sqlite3_close(db);
+          return 1;
+        }
+        if ((rc_2 = sqlite3_step(stmt_in)) != SQLITE_DONE){
+          fprintf(stderr, "Update blue failed: %s\n", sqlite3_errmsg(db));
+          sqlite3_close(db);
+          return 1;     
+        }
+        pch = strtok(NULL, " ");
+        strcpy(sql_final_insert,"");
       }
 
     }
   
   }
-  sql_results[500] = "SELECT DISTINCT airplane from long_distance_aircraft;";
+  char sql_results[500] = "SELECT DISTINCT airplane from aircraft;";
   rc_3 = sqlite3_prepare_v2(db, sql_results, -1, &stmt_re, 0);
   if (rc_3 != SQLITE_OK) {  
     fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
     return 1;
   }
-  if ((rc_3 = sqlite3_step(stmt_re)) != SQLITE_DONE){
-      fprintf(stderr, "Update failed: %s\n", sqlite3_errmsg(db));
+  while((rc_3 = sqlite3_step(stmt_re)) == SQLITE_ROW) {
+        
+        printf("%s", sqlite3_column_text(stmt_re, 0));
+        printf("\n");
+  }
+
+  char sql_drop_table[50] = "delete from aircraft;";
+  rc_4 = sqlite3_prepare_v2(db, sql_drop_table, -1, &stmt_dr, 0);
+
+  if (rc_4 != SQLITE_OK) {  
+      fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
+      sqlite3_close(db);
+      return 1;
+    }
+  //creating a new long distance plane table
+  if ((rc_4 = sqlite3_step(stmt_dr)) != SQLITE_DONE){
+      fprintf(stderr, "Update hier failed: %s\n", sqlite3_errmsg(db));
       sqlite3_close(db);
       return 1;     
   }
+  
 
  	sqlite3_finalize(stmt); //always finalize a statement
-  sqlite3_finalize(stmt_cr);
+  //sqlite3_finalize(stmt_cr);
   sqlite3_finalize(stmt_in);
   sqlite3_finalize(stmt_re);
+  sqlite3_finalize(stmt_dr);
 }
 
 
