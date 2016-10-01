@@ -1,10 +1,9 @@
 //Avery Tan
-//to compile executable code, type "gcc -g q4.c sqlite3.c -lpthread -ldl -lm"
+//assignment1 CMPUT391
 #include <stdio.h>
 #include <sqlite3.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*::                                                                         :*/
@@ -34,7 +33,6 @@
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 
 #include <math.h>
-
 #define pi 3.14159265358979323846
 
 /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -80,7 +78,7 @@ double rad2deg(double rad) {
 
 
 //######################################################################################################
-
+//END OF GEOGRAPHIC DISTANCE CODE
 
 
 
@@ -100,33 +98,48 @@ int main(int argc, char **argv){
   double dest_lat = 0;
   double dest_lon = 0;
   char database_name[25] = "openflights.db";
-	sqlite3 *db; //the database
-	sqlite3_stmt *stmt; //the update statement
+  sqlite3 *db; //the database
+  sqlite3_stmt *stmt; //the update statement
+
+
+    /*
+  Q4 (10 pts)
+
+  Write a C program, in a file called q4.c that prints the list of 
+  top-10 lengthiest commercial flights (measured by the geographical 
+  distance between the respective airports). 
+  See https://en.wikipedia.org/wiki/Geographical_distance.
+  */
   
   char sql_statement[999] =  "SELECT r1.* , ap1.latitude, ap1.longitude, ap2.latitude, "\
                                       "ap2.longitude "\
-                              "FROM routes r1, airports ap1, airports ap2 "\
+                              "FROM routes r1, airports ap1, airports ap2, airlines al "\
                               "WHERE r1.source_airport_ID = ap1.airport_id and " \
-                                    "r1.destination_airport_ID = ap2.airport_id ";
+                                    "r1.destination_airport_ID = ap2.airport_id "\
+                                    "and al.airline_id = r1.airline_id and "\
+                                    "al.iata is not null and al.icao is not null "\
+                                    "and al.callsign is not null and al.country is not null;";
 
-	int rc;
+  int rc;
 
 
-	rc = sqlite3_open(database_name, &db);
-	if( rc ){
-  	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-  	sqlite3_close(db);
-  	return(1);
-	}
-	rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0); //opening database to get all queries of flights
+  rc = sqlite3_open(database_name, &db);
+  if( rc ){
+    fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return(1);
+  }
+  rc = sqlite3_prepare_v2(db, sql_statement, -1, &stmt, 0); //opening database to get all queries of flights
 
   if (rc != SQLITE_OK) {  
-      fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
-      sqlite3_close(db);
-      return 1;
+    fprintf(stderr, "Preparation failed: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return 1;
   }
 
   while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+
+    //store the first 10 results in a list-like structure
     if (count < 10){
       airline[count] = strdup((char *) sqlite3_column_text(stmt, 0));
       source_airport[count] = strdup((char *) sqlite3_column_text(stmt, 2));
@@ -136,28 +149,33 @@ int main(int argc, char **argv){
       source_lon = atof((char *) sqlite3_column_text(stmt, 10));
       dest_lat = atof((char *) sqlite3_column_text(stmt, 11));
       dest_lon = atof((char *) sqlite3_column_text(stmt, 12));
+      //compute the geographical distance
       geodistance[count]= distance( source_lat, source_lon ,dest_lat,dest_lon,'K');
       count = count + 1;
     } 
     else{
+
       double min_distance = 1000000000;
       int min_index;
       count = 0;
+      //recalculate the minimum value of our list-like structure
       while (count < 10){
         if (geodistance[count] < min_distance){
           min_distance = geodistance[count];
-          min_index = count;
+          //remembering where the minimum value is located in our array
+          min_index = count; 
         }
         count = count +1;
       }
-      //printf("min is  %lf", min_distance);
 
       source_lat = atof((char *) sqlite3_column_text(stmt, 9));
       source_lon = atof((char *) sqlite3_column_text(stmt, 10));
       dest_lat = atof((char *) sqlite3_column_text(stmt, 11));
       dest_lon = atof((char *) sqlite3_column_text(stmt, 12));
       geo_comparator= distance( source_lat, source_lon ,dest_lat,dest_lon,'K');
-
+      
+      //compare this current routes distance to our distance minimum value
+      //if it's greater, replace that min value with the value greater than it
       if (geo_comparator > min_distance){
         airline[min_index] = strdup((char *) sqlite3_column_text(stmt, 0));
         source_airport[min_index] = strdup((char *) sqlite3_column_text(stmt, 2));
@@ -173,12 +191,14 @@ int main(int argc, char **argv){
     }
   }
   int i = 0;
+
+  //print out our 10 results
   while (i < 10){
     printf("%s\n",airline[i]);
     printf("%s\n",source_airport[i]) ;
     printf("%s\n",destination_airport[i] );
     printf("%s\n",equipment[i]);
-    printf("%lf\n\n\n",geodistance[i]);
+    printf("%lf\n\n",geodistance[i]);
     i = i +1;
   }
 

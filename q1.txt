@@ -1,1 +1,15 @@
-Is this database normalized? hmmm that's a very good question
+Avery Tan
+q1.txt
+assignment 1 CMPUT391
+
+
+In a plain text ASCII file called q1.txt answer the question is the database normalized? Explain your answer in 1 or 2 paragraphs.
+
+
+
+
+Is this database normalized? No it is not. 
+Normalization is concerned with minimizing redundant data and making sure that dependencies between data make sense.
+
+The unique identifier for both the airports table and the airlines table, airport_id and airline_id are both questionable as I can see no reason why IATA/FAA, ICAO or IATA cannot act as the unique key from an outsider's perspective. 
+Furthermore, the routes table is full of redundant information as well as some columns that should deserve their own table. I don't believe source_airport or destination_airport or airline belong in the table. It's redundant! The stops column doesn't really make much sense either since for all intents and purposes, even if an airline lands for refuelment in an airport which isn't it's destination, it makes little sense to document that and indeed only a handful of tuples have a stops value greater than 0. Lastly the routes equipment attribute dserves it's own table. Some routes list 2 types of aircraft separated by a space in the equipment column. This is not very good at all. They should have their own table to eliminate this problem.
